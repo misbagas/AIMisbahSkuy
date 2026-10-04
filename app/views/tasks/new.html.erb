@@ -1,0 +1,125 @@
+<section class="new-task-page <%= "has-messages" if @messages.any? %>">
+  <div class="new-task-content" data-controller="task-composer">
+    <div class="new-task-intro <%= "chat-intro-hidden" if @messages.any? %>">
+      <p class="new-task-eyebrow">MISBAH EXPLOIT AI</p>
+      <h1><%= @task_greeting %></h1>
+    </div>
+
+    <% if @messages.any? %>
+      <div class="chat-scroll" aria-live="polite">
+        <div class="chat-conversation">
+          <% @messages.each do |message| %>
+            <% if message["role"] == "user" %>
+              <article class="chat-message chat-message-user">
+                <% if message["content"].present? %>
+                  <div class="chat-user-bubble"><%= message["content"] %></div>
+                <% end %>
+
+                <% if message["attachments"].present? %>
+                  <div class="chat-attachments" aria-label="Uploaded files">
+                    <% message["attachments"].each do |attachment| %>
+                      <% content_type = attachment["content_type"].to_s.downcase %>
+                      <div class="chat-attachment <%= "chat-attachment-media" if content_type.start_with?("image/", "video/") %>">
+                        <% if %w[image/png image/jpeg image/jpg image/webp image/gif].include?(content_type) %>
+                          <a href="<%= attachment["url"] %>" target="_blank" rel="noopener" class="chat-attachment-media-link">
+                            <img src="<%= attachment["url"] %>" alt="<%= attachment["name"] %>" loading="lazy" class="chat-attachment-image">
+                          </a>
+                        <% elsif %w[video/mp4 video/webm video/ogg].include?(content_type) %>
+                          <video class="chat-attachment-video" controls preload="metadata">
+                            <source src="<%= attachment["url"] %>" type="<%= content_type %>">
+                            Your browser does not support this video format.
+                          </video>
+                        <% else %>
+                          <span class="chat-attachment-icon" aria-hidden="true">▧</span>
+                        <% end %>
+
+                        <span class="chat-attachment-details">
+                          <strong title="<%= attachment["name"] %>"><%= attachment["name"] %></strong>
+                          <small><%= attachment["content_type"].presence || "File" %> · <%= number_to_human_size(attachment["size"]) %></small>
+                          <a href="<%= attachment["download_url"] %>" class="chat-attachment-download">Download</a>
+                        </span>
+                      </div>
+                    <% end %>
+                  </div>
+                <% end %>
+              </article>
+            <% else %>
+              <article class="chat-message chat-message-assistant">
+                <div class="chat-assistant-mark" aria-hidden="true">M</div>
+                <div class="chat-assistant-content">
+                  <strong>MisbahExploitAI</strong>
+                  <div><%= simple_format(message["content"]) %></div>
+                </div>
+              </article>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if flash[:notice] %>
+      <p class="task-feedback task-feedback-success"><%= flash[:notice] %></p>
+    <% elsif flash[:alert] %>
+      <p class="task-feedback task-feedback-alert"><%= flash[:alert] %></p>
+    <% end %>
+
+    <%= form_with url: tasks_path,
+      method: :post,
+      multipart: true,
+      class: "task-composer",
+      data: {
+        task_composer_target: "form",
+        action: "dragover->task-composer#dragOver dragleave->task-composer#dragLeave drop->task-composer#drop submit->task-composer#submitting"
+      } do |form| %>
+      <label for="task-attachment" class="composer-icon composer-add" aria-label="Upload file">+</label>
+      <%= form.file_field :attachments,
+        id: "task-attachment",
+        multiple: true,
+        class: "composer-file-input",
+        aria: { label: "Upload file" },
+        data: { task_composer_target: "fileInput", action: "change->task-composer#fileSelected" } %>
+      <span class="composer-upload-status"
+            data-task-composer-target="uploadStatus"
+            aria-live="polite">Upload File</span>
+      <%= form.text_area :prompt,
+        value: @prompt,
+        placeholder: "Ask MisbahExploitAI",
+        aria: { label: "Task prompt" },
+        class: "composer-input",
+        data: { task_composer_target: "input", action: "keydown->task-composer#submitOnEnter" },
+        rows: 1 %>
+      <div class="composer-actions">
+        <button type="button" class="composer-icon composer-mic" aria-label="Use microphone">&#9835;</button>
+        <%= form.button "&#8594;".html_safe,
+          class: "composer-icon composer-send",
+          aria: { label: "Send prompt" },
+          data: { task_composer_target: "submit" } %>
+      </div>
+    <% end %>
+
+    <div class="attachments-preview-list"
+      data-task-composer-target="previewList"
+      aria-live="polite"
+      hidden></div>
+
+    <% if @uploaded_attachments.present? %>
+      <div class="attachments-preview-list upload-preview-server">
+        <% @uploaded_attachments.each do |attachment| %>
+          <div class="attachment-preview">
+            <span class="attachment-preview-thumb">▧</span>
+            <span class="attachment-preview-details">
+              <strong><%= attachment["name"] %></strong>
+              <small>Upload received</small>
+            </span>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if @task_error %>
+      <p class="task-feedback task-feedback-alert"><%= @task_error %></p>
+    <% end %>
+
+    <p class="new-task-caption">AI can make mistakes. Check important information.</p>
+  </div>
+</section>

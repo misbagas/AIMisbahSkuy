@@ -1,0 +1,32 @@
+<section class="services-page">
+  <header class="services-header">
+    <p class="services-eyebrow">WORKSPACE</p>
+    <h1>All services</h1>
+    <p class="services-intro">
+      Choose a focused AI workspace for the task in front of you.
+    </p>
+  </header>
+
+  <div class="services-grid">
+    <% [
+      ["Research", "Gather context, compare sources, and turn open questions into clear findings."],
+      ["Writing", "Shape rough ideas into concise briefs, polished copy, and useful documentation."],
+      ["Analysis", "Find patterns in your data and turn complex information into practical decisions."],
+      ["Automation", "Build repeatable workflows that move routine work forward for you."],
+      ["Strategy", "Explore options, clarify priorities, and map the next best step."],
+      ["Creative studio", "Develop fresh directions for campaigns, products, and presentations."]
+    ].each do |name, description| %>
+      <article class="service-card">
+        <div class="service-card-icon" aria-hidden="true"><%= name.first %></div>
+        <div class="service-card-content">
+          <h2><%= name %></h2>
+          <p><%= description %></p>
+        </div>
+        <%= link_to new_task_path, class: "service-card-link" do %>
+          <span>Start</span>
+          <span aria-hidden="true">-&gt;</span>
+        <% end %>
+      </article>
+    <% end %>
+  </div>
+</section>

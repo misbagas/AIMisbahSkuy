@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  command: MyText
+  status: MyString
+  output: MyText
+  language: MyString
+  exit_code: 1
+  ai_response: MyText
+
+two:
+  command: MyText
+  status: MyString
+  output: MyText
+  language: MyString
+  exit_code: 1
+  ai_response: MyText

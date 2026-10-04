@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MisbahExploitAI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="app-body">
+    <%= render "shared/sidebar" %>
+    <%= render "shared/topbar" %>
+
+    <main class="app-main">
+      <%= yield %>
+    </main>
+  </body>
+</html>

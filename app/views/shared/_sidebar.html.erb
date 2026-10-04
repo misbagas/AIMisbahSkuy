@@ -1,0 +1,152 @@
+<aside class="sidebar">
+  <div class="sidebar-inner">
+    <%= link_to new_task_path(reset: true), class: "new-task-button" do %>
+      <span class="plus">+</span>
+      <span>New task</span>
+    <% end %>
+
+    <nav class="sidebar-nav">
+      <%= link_to homebase_path, class: "sidebar-link #{'active' if current_page?(homebase_path)}" do %>
+        <span class="sidebar-icon">⌂</span>
+        <span>Home</span>
+      <% end %>
+
+      <%= link_to services_path, class: "sidebar-link #{'active' if current_page?(services_path)}" do %>
+        <span class="sidebar-icon">▦</span>
+        <span>All services</span>
+      <% end %>
+
+      <%= link_to automations_path, class: "sidebar-link #{'active' if current_page?(automations_path)}" do %>
+        <span class="sidebar-icon">♧</span>
+        <span>Automations</span>
+      <% end %>
+    </nav>
+
+    <h2 class="sidebar-heading">PINNED</h2>
+
+    <div class="projects-list">
+      <% @saved_projects.each do |project| %>
+        <div class="project-item">
+          <%= link_to "#", class: "project-link" do %>
+            <span class="project-icon">□</span>
+            <span><%= project %></span>
+          <% end %>
+
+          <details class="project-actions">
+            <summary class="project-menu-icon" aria-label="Actions for <%= project %>">&#8942;</summary>
+
+            <div class="dropdown-menu recent-project-menu">
+              <%= button_to "Unpin", unpin_project_path, method: :patch, params: { name: project }, class: "dropdown-item", form: { class: "menu-form" } %>
+              <%= button_to "Delete", delete_project_path, method: :delete, params: { name: project }, class: "dropdown-item", form: { class: "menu-form" } %>
+              <%= button_to "Share", share_project_path, method: :post, params: { name: project }, class: "dropdown-item", form: { class: "menu-form" } %>
+              <%= button_to "Archive", archive_project_path, method: :patch, params: { name: project }, class: "dropdown-item", form: { class: "menu-form" } %>
+              <button type="button" class="dropdown-item">Rename</button>
+            </div>
+          </details>
+        </div>
+      <% end %>
+    </div>
+
+    <h2 class="sidebar-heading">RECENTS</h2>
+
+    <div class="projects-list">
+      <% @recent_projects.each do |project| %>
+        <% project_name = project.is_a?(Hash) ? project["name"] : project %>
+        <div class="project-item">
+          <%= link_to new_task_path(prompt: project_name, recent: true, reset: true), class: "project-link" do %>
+            <span class="project-icon">□</span>
+            <span><%= project_name %></span>
+          <% end %>
+
+          <details class="project-actions">
+            <summary class="project-menu-icon" aria-label="Actions for <%= project_name %>">&#8942;</summary>
+
+            <div class="dropdown-menu recent-project-menu">
+              <button type="button"
+                      class="dropdown-item"
+                      popovertarget="rename-dialog-<%= project_name.parameterize %>">
+                Rename
+              </button>
+              <%= button_to "Archive", archive_project_path, method: :patch, params: { name: project_name }, class: "dropdown-item", form: { class: "menu-form" } %>
+              <%= button_to "Delete", delete_project_path, method: :delete, params: { name: project_name }, class: "dropdown-item", form: { class: "menu-form" } %>
+              <%= button_to "Share", share_project_path, method: :post, params: { name: project_name }, class: "dropdown-item", form: { class: "menu-form" } %>
+              <%= button_to "Pin", pin_recent_path, method: :patch, params: { current_name: project_name }, class: "dropdown-item", form: { class: "menu-form" } %>
+            </div>
+          </details>
+
+          <div id="rename-dialog-<%= project_name.parameterize %>"
+               class="modal-backdrop"
+               popover="manual"
+               aria-hidden="true"
+               data-controller="rename-project">
+            <section class="rename-dialog" role="dialog" aria-modal="true" aria-label="Rename recent command">
+              <form method="post" action="<%= rename_recent_path %>" data-action="submit->rename-project#validate">
+              <input type="hidden" name="_method" value="patch">
+              <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+              <input type="hidden" name="current_name" value="<%= project_name %>">
+                <div class="dialog-body">
+                  <label for="rename-project-<%= project_name.parameterize %>">Name</label>
+                  <input id="rename-project-<%= project_name.parameterize %>"
+                         class="rename-input"
+                         name="name"
+                         maxlength="80"
+                         autocomplete="off"
+                         value="<%= project_name %>"
+                         data-rename-project-target="input">
+                  <div class="rename-log" data-rename-project-target="log" aria-live="polite"></div>
+                </div>
+
+                <div class="dialog-actions">
+                  <button type="button"
+                          class="btn btn-secondary"
+                          popovertarget="rename-dialog-<%= project_name.parameterize %>"
+                          popovertargetaction="hide">
+                    Cancel
+                  </button>
+                  <button type="submit" class="btn btn-primary">Rename</button>
+                </div>
+              </form>
+            </section>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <% if @archived_projects.any? %>
+      <h2 class="sidebar-heading">ARCHIVED</h2>
+
+      <div class="projects-list">
+        <% @archived_projects.each do |project| %>
+          <% project_name = project.is_a?(Hash) ? project["name"] : project %>
+          <div class="project-item">
+            <%= link_to new_task_path(prompt: project_name, recent: true, reset: true), class: "project-link archived-project-link" do %>
+              <span class="project-icon">□</span>
+              <span><%= project_name %></span>
+            <% end %>
+
+            <details class="project-actions">
+              <summary class="project-menu-icon" aria-label="Actions for <%= project_name %>">&#8942;</summary>
+
+              <div class="dropdown-menu recent-project-menu">
+                <%= button_to "Unarchive", unarchive_project_path, method: :patch, params: { name: project_name }, class: "dropdown-item", form: { class: "menu-form" } %>
+              </div>
+            </details>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="credits-card">
+      <div class="credits-header">
+        <span>AI Credits</span>
+        <strong><%= number_with_delimiter(@credits) %> / 2,400</strong>
+      </div>
+
+      <div class="credits-bar">
+        <div class="credits-progress"></div>
+      </div>
+
+      <%= link_to "Buy Credits", "#", class: "buy-credits" %>
+    </div>
+  </div>
+</aside>

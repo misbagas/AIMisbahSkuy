@@ -9,7 +9,7 @@
 
   <div class="services-grid">
     <% [
-      ["Research", "Gather context, compare sources, and turn open questions into clear findings."],
+      ["ResumeMaker", "Build an evidence-first resume with live A4 preview, ATS checks and job matching."],
       ["Writing", "Shape rough ideas into concise briefs, polished copy, and useful documentation."],
       ["Analysis", "Find patterns in your data and turn complex information into practical decisions."],
       ["Automation", "Build repeatable workflows that move routine work forward for you."],
@@ -22,7 +22,7 @@
           <h2><%= name %></h2>
           <p><%= description %></p>
         </div>
-        <%= link_to new_task_path, class: "service-card-link" do %>
+        <%= link_to(name == "ResumeMaker" ? resume_maker_path : new_task_path, class: "service-card-link") do %>
           <span>Start</span>
           <span aria-hidden="true">-&gt;</span>
         <% end %>

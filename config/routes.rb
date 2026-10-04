@@ -13,6 +13,9 @@ Rails.application.routes.draw do
   delete "/projects", to: "tasks#delete_project", as: :delete_project
   post "/projects/share", to: "tasks#share_project", as: :share_project
   get "/services", to: "pages#services", as: :services
+  get "/resume-maker", to: "pages#resume_maker", as: :resume_maker
+  get "/styles.css", to: "pages#resume_maker_stylesheet", as: :resume_maker_stylesheet
+  get "/app.js", to: "pages#resume_maker_script", as: :resume_maker_script
   get "/automations", to: "pages#automations", as: :automations
 
   get "up" => "rails/health#show", as: :rails_health_check
